@@ -4,7 +4,7 @@ import System.Exit
 import DataTypes
 import Hibernate
 import Utils
-import Gui
+import Ui
 import Logic
 
 --Główna funkcja progrmau
@@ -86,7 +86,7 @@ menuManualSchedule model = do
 --    ("Wyświetl plan dla przedmiotów", listSubjectsSchedule),
 --    ("Wyświetl plan dla grup", listGroupsSchedule),
 --    ("Wyświetl plan zajętości sal", listClassroomsSchedule),
---    ("Dodaj zajęcia do planu", addCourse),
+    ("Dodaj zajęcia do planu", addCourse),
 --    ("Usuń zajęcia z planu", removeCourse),
     ("Powrót do głównego menu", showMainMenuInLoop)]
   model <- function model

@@ -3,7 +3,7 @@
 import DataTypes
 import Hibernate
 import Utils
-import Gui
+import Ui
 import Data.Maybe
 import Strings
 
@@ -12,9 +12,15 @@ import Strings
 --Logika związana z przedmiotami
 ----Wyświetlenie przedmiotów
 listSubjects model = do 
-  printSeparator
+  showMessageBox "Przedmiot - liczba godzin"
+  showMessageBox subjects
   print $ getClasses model
   return model
+  where
+    classes = getClasses model
+    
+    subjects = 
+
 
 --- Wczytanie nazwy nowego przedmiotu
 getNewSubjectName subject = getObjectName subject notElem "Podaj nazwę nowego przedmiotu"
@@ -40,12 +46,12 @@ readMaybeTime s =
 addSubject (Model classes  classrooms groups schedule)  = do 
   maybeSubjectName <- getNewSubjectName ( getSubjects classes )
   if isNothing maybeSubjectName then do 
-    showMessage subjectExistErrorString
+    showMessageBox subjectExistErrorString
     return (Model classes classrooms groups schedule)
   else do
     maybeDurationTime <- getNewDurationTime
     let newClasses = doAddSubject ( fromJust maybeSubjectName) ( fromJust maybeDurationTime) classes
-    showMessage successfulOperationString
+    showMessageBox successfulOperationString
     return (Model newClasses  classrooms groups schedule)
 
 doAddSubject subjectName durationTime (Classes c) = Classes ([(Class subjectName durationTime)] ++ c)
@@ -54,12 +60,12 @@ doAddSubject subjectName durationTime (Classes c) = Classes ([(Class subjectName
 removeSubject (Model classes classrooms groups schedule ) = do
   maybeSubjectName <- getExisitingSubjectName ( getSubjects classes )
   if isNothing maybeSubjectName then do 
-    showMessage subjectNonExistingErrorString
+    showMessageBox subjectNonExistingErrorString
     return (Model classes classrooms groups schedule)
   else do
     -- TODO dopisanie usuwianie usuniętego obiektu z już ułożonego planu albo jakieś inne rozwiązanie
     let newClasses = doRemoveSubject ( fromJust maybeSubjectName) classes
-    showMessage successfulOperationString
+    showMessageBox successfulOperationString
     return (Model (Classes newClasses)  classrooms groups schedule)
     
 doRemoveSubject subjectName (Classes c) = removeClass subjectName c
@@ -86,11 +92,11 @@ listGroups model = do
 addGroup (Model classes  classrooms groups schedule)  = do 
   maybeGroupName <- getNewGroupName (getGroupList groups)
   if isNothing maybeGroupName then do 
-    showMessage groupExistErrorString
+    showMessageBox groupExistErrorString
     return (Model classes classrooms groups schedule)
   else do
     let newGroups = doAddGroup ( fromJust maybeGroupName) groups
-    showMessage successfulOperationString
+    showMessageBox successfulOperationString
     return (Model classes  classrooms newGroups schedule)
 
 doAddGroup groupName (Groups g) = Groups ([groupName] ++ g)
@@ -99,12 +105,12 @@ doAddGroup groupName (Groups g) = Groups ([groupName] ++ g)
 removeGroup (Model classes classrooms groups schedule ) = do
   maybeGroupName <- getExisitingGroupName (getGroupList groups)
   if isNothing maybeGroupName then do  
-    showMessage groupNonExistingErrorString
+    showMessageBox groupNonExistingErrorString
     return (Model classes classrooms groups schedule)
   else do
     -- TODO dopisanie usuwianie usuniętego obiektu z już ułożonego planu albo jakieś inne rozwiązanie
     let newGroups = doRemoveGroup ( fromJust maybeGroupName) groups
-    showMessage successfulOperationString
+    showMessageBox successfulOperationString
     return (Model classes  classrooms ( Groups newGroups) schedule)
     
 doRemoveGroup groupName (Groups g) = removeItem groupName g
@@ -126,11 +132,11 @@ listClassrooms model = do
 addClassroom (Model classes  classrooms groups schedule)  = do 
   maybeClassroomName <- getNewClassroomName (getClassroomList classrooms)
   if isNothing maybeClassroomName then do 
-    showMessage classroomExistErrorString
+    showMessageBox classroomExistErrorString
     return (Model classes classrooms groups schedule)
   else do
     let newClassrooms = doAddClassroom ( fromJust maybeClassroomName) classrooms
-    showMessage successfulOperationString
+    showMessageBox successfulOperationString
     return (Model classes  newClassrooms groups schedule)
 
 doAddClassroom classroomName (Classrooms c) = Classrooms ([classroomName] ++ c)
@@ -139,12 +145,12 @@ doAddClassroom classroomName (Classrooms c) = Classrooms ([classroomName] ++ c)
 removeClassroom (Model classes classrooms groups schedule ) = do
   maybeClassroomName <- getExisitingClassroomName (getClassroomList classrooms)
   if isNothing maybeClassroomName then do  
-    showMessage classroomNonExistingErrorString
+    showMessageBox classroomNonExistingErrorString
     return (Model classes classrooms groups schedule)
   else do
     -- TODO dopisanie usuwianie usuniętego obiektu z już ułożonego planu albo jakieś inne rozwiązanie
     let newClassrooms = doRemoveClassroom ( fromJust maybeClassroomName) classrooms
-    showMessage successfulOperationString
+    showMessageBox successfulOperationString
     return (Model classes ( Classrooms newClassrooms) groups schedule)
     
 doRemoveClassroom classroomName (Classrooms c) = removeItem classroomName c
@@ -158,26 +164,26 @@ addCourse model = do
   listGroups model
   maybeGroupName <- getExisitingGroupName (getGroupList groups)
   if isNothing maybeGroupName then do  
-    showMessage groupNonExistingErrorString
+    showMessageBox groupNonExistingErrorString
     return model
   else do
     listSubjects model
     maybeSubjectName <- getExisitingSubjectName ( getSubjects classes )
     if isNothing maybeSubjectName then do 
-      showMessage subjectNonExistingErrorString
+      showMessageBox subjectNonExistingErrorString
       return model
     else do
       listClassrooms model
       maybeClassroomName <- getExisitingClassroomName (getClassroomList classrooms)
       if isNothing maybeClassroomName then do  
-        showMessage classroomNonExistingErrorString
+        showMessageBox classroomNonExistingErrorString
         return model
       else do
         maybeStartTime <- getStartTime
         maybeEndTime <- getEndTime
         maybeDay <- getDayGui
         if isNothing maybeStartTime || isNothing maybeEndTime || isNothing maybeDay then do 
-          showMessage hourErrorString
+          showMessageBox hourErrorString
           return model
         else do
           let newSubject = fromJust maybeSubjectName
@@ -186,11 +192,12 @@ addCourse model = do
           let newDay = (toEnum (fromJust maybeDay)) :: Day
           let dayTime = DayTime newDay ( fromJust maybeStartTime) (fromJust maybeEndTime)
           let course = Course newSubject newGroup newClassroom dayTime
-          if not $ checkCourse model course then do
-            showMessage collisionErrorString
+          if  checkCourse model course then do
+            showMessageBox collisionErrorString
             return model
           else do
-            return model
+            showMessageBox successfulOperationString
+            return ( addCourseToModel model course) 
           
           
     
@@ -220,11 +227,46 @@ readMaybeDay :: String -> Maybe Int
 readMaybeDay s =
 	case reads s of
 	[(x, "")] -> 
-                if x >= 1 && x <= 7 then 
+                if x >= 0 && x <= 6 then 
                   Just x
                 else 
                   Nothing
 	_ -> Nothing
 
+
+-- True oznacza, że w nie można umieścić w planie tego kursu  
 checkCourse :: Model -> Course -> Bool
-checkCourse model course = True
+checkCourse model course = 
+  checkSubject schedule course || checkGroup schedule course || checkClassroom schedule course
+  where schedule = getSchedule model
+
+checkSubject schedule course = 
+  elem dayTime (map snd selectedSubjectList) 
+  where 
+    
+    dayTime = getDayTime course
+    subject = getSubjectCourse course
+    coursesList = getCourseList schedule
+    subjectList = zip (map getSubjectCourse coursesList) (map getDayTime coursesList)
+    selectedSubjectList = map fromJust $ filter isJust  $ map (\x -> if fst x == subject then Just (fst x,snd x) else Nothing) subjectList
+    
+    
+checkGroup schedule course = 
+  elem dayTime (map snd selectedGroupList) 
+  where  
+    
+    dayTime = getDayTime course
+    group = getGroup course
+    coursesList = getCourseList schedule
+    groupList = zip (map getGroup coursesList) (map getDayTime coursesList)
+    selectedGroupList = map fromJust $ filter isJust  $ map (\x -> if fst x == group then Just (fst x,snd x) else Nothing) groupList
+    
+checkClassroom schedule course = 
+  elem dayTime (map snd selectedGroupList) 
+  where  
+    
+    dayTime = getDayTime course
+    classroom = getClassroom course
+    coursesList = getCourseList schedule
+    classroomList = zip (map getClassroom coursesList) (map getDayTime coursesList)
+    selectedGroupList = map fromJust $ filter isJust  $ map (\x -> if fst x == classroom then Just (fst x,snd x) else Nothing) classroomList

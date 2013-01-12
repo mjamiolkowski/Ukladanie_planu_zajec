@@ -27,3 +27,7 @@ hourErrorString = "Nieprawidłowy format wprowadzonej daty"
 
 -- Błędy układania planu
 collisionErrorString = "Nie można dodać do planu wprowadzonych zajęć z powodu, że użyte zasoby są w tym czasie już wykorzystywane!"
+
+classroomBusyErrorString = "Podana sala jest już zajęta w zdefiniownym czasie"
+groupBusyErrorString = "Podana grupa jest już przypisana do zajęć w zdefiniowanym czasie"
+subjectBusyErrorString = "Podany przedmiot jest już wykładany w zdefiniowanym czasie"

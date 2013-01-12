@@ -3,7 +3,7 @@
 import DataTypes
 import Data.Maybe
 import Utils
-import Gui
+import Ui
 import Strings
 -- Pusty Model
 createModel = Model (Classes []) (Classrooms []) (Groups []) (Schedule [])
@@ -12,7 +12,7 @@ createModel = Model (Classes []) (Classrooms []) (Groups []) (Schedule [])
 saveModel model = do 
   filePath <- showFileInputBox
   saveToFile model filePath
-  showMessage successfulOperationString
+  showMessageBox successfulOperationString
   return model
 
 -- Wczytanie modelu z pliku
@@ -23,10 +23,10 @@ loadModel model =
       filePath <- showFileInputBox
       maybeModel <- loadFromFile filePath readMaybeModel
       if isNothing maybeModel then do
-        showMessage invalidFormatErrorString
+        showMessageBox invalidFormatErrorString
         return model
       else do 
-          showMessage successfulOperationString
+          showMessageBox successfulOperationString
           let newModel = fromJust maybeModel
           return newModel
 			where
@@ -34,11 +34,11 @@ loadModel model =
 				readMaybeModel = readMaybe
         
     showError model = do
-      showMessage cannotOpenFileErrorString
+      showMessageBox cannotOpenFileErrorString
       return model
 		
 
 -- Wyczyszczenie modelu
 clearModel model = do
-	showMessage successfulOperationString
+	showMessageBox successfulOperationString
 	return createModel
