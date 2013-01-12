@@ -56,7 +56,7 @@ data Schedule = Schedule [Course] deriving (Show, Read)
 getCourseList (Schedule []) = []
 getCourseList (Schedule [c]  )= [c] 
 
-data Model = Model Classes Classrooms Groups Schedule deriving (Show, Read)
+data Model = Model [Class] [Classroom] [Group] [Course] deriving (Show, Read)
 getClasses (Model c _ _ _) =  c
 getClassrooms (Model _ c _ _) = c
 getGroups (Model _ _ g _) = g
@@ -64,4 +64,4 @@ getSchedule (Model _ _ _ s) = s
 
 
 addCourseToModel :: Model -> Course -> Model
-addCourseToModel (Model c1 c2 g c3) course = Model c1 c2 g ( Schedule ([course] ++ (getCourseList c3)))
+addCourseToModel (Model c1 c2 g c3) course = Model c1 c2 g ( ([course] ++ c3))
