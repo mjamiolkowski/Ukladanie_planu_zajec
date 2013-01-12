@@ -6,7 +6,7 @@ import Utils
 import Ui
 import Strings
 -- Pusty Model
-createModel = Model (Classes []) (Classrooms []) (Groups []) (Schedule [])
+createModel = Model [] [] [] []
 
 -- Zapis modelu do pliku
 saveModel model = do 

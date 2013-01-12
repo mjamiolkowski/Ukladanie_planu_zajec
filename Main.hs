@@ -83,9 +83,7 @@ menuClassroom model = do
 --Wyświetlanie manualnego układanie rozkładu
 menuManualSchedule model = do 
   function <- showMenuBox[
---    ("Wyświetl plan dla przedmiotów", listSubjectsSchedule),
---    ("Wyświetl plan dla grup", listGroupsSchedule),
---    ("Wyświetl plan zajętości sal", listClassroomsSchedule),
+    ("Wyświetl plan dla przedmiotów", showSchedule),
     ("Dodaj zajęcia do planu", addCourse),
 --    ("Usuń zajęcia z planu", removeCourse),
     ("Powrót do głównego menu", showMainMenuInLoop)]
