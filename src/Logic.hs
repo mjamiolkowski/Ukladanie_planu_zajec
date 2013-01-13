@@ -301,6 +301,14 @@ checkDayTimeCollision  dt1 dt2 =
 showSchedule model = do
   showMessageBox "Poniedziałek"
   showMessageBox (listSchedule model Pon)
+  showMessageBox "Wtorek"
+  showMessageBox (listSchedule model Wt)
+  showMessageBox "Środa"
+  showMessageBox (listSchedule model Sr)
+  showMessageBox "Czwartek"
+  showMessageBox (listSchedule model Czw)
+  showMessageBox "Piątek"
+  showMessageBox (listSchedule model Pt)
   return model
 
 listSchedule model day =
