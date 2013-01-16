@@ -1,0 +1,1 @@
+Model [Class "ANA2" 2,Class "ANA1" 3,Class "SPOP" 4] ["sala3","sala2","sala1"] ["I1G2","I1G1"] []

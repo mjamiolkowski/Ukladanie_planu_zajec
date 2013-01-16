@@ -2,6 +2,7 @@
 
 import System.Exit
 import DataTypes
+import Data.Char
 import Hibernate
 import Utils
 import Ui
@@ -27,6 +28,7 @@ showMainMenu =
         ("Odczyt danych z pliku", loadModel),
         ("Wyczyszczenie danych", clearModel),
         ("Manualne ukladanie planu zajec",showManualScheduleInLoop), 
+		("Automatyczne ukladanie planu zajec",runAutoSchedule), 
 				("Zakończ", exit)]
         
         
@@ -50,8 +52,6 @@ showManualScheduleInLoop model = do
   printNewLine
   model <- menuManualSchedule model
   showManualScheduleInLoop model
-
-
         
 --Wyświetla podmenu przedmioty
 menuSubject model = do
