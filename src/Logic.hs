@@ -323,11 +323,70 @@ listSchedule model day =
     seph = " - "
     tab  = "\t"
     
-
-  
 compareDays c1 c2 = 
   if d1  > d2 then GT
   else LT
   where
     d1 = getClassStartTime   (getDayTime c1)
     d2 = getClassStartTime $ getDayTime c2
+
+-- logika zwiazana z automatycznym ukladaniem planu zajec
+addingLoop model subjectIt dayIt firstFreeHour groupIt classroomIt = do
+	if dayIt > 7 then
+		return model
+	else do
+	if subjectIt >= length(getSubjects classes) then do
+		printString("PLAN ZAJEC ZOSTAL ULOZONY! BRAWO!")
+		return model
+	else do
+	
+	model <- tryAdding model subjectIt dayIt firstFreeHour groupIt classroomIt
+	printString("\nUdalo sie dodac!!!!!!!\n")
+	showSchedule model
+	
+	--dodaj kolejna grupe
+	if groupIt < (length groups) - 1 then
+		addingLoop model subjectIt 0 firstFreeHour (groupIt+1) 0
+	else -- dodaj kolejny przedmiot
+		addingLoop model (subjectIt+1) dayIt firstFreeHour 0 0
+		
+	where
+		classes = getClasses model
+		groups = getGroups model
+
+tryAdding model subjectIt dayIt firstFreeHour groupIt classroomIt= do
+	printString("Pierwsza wolna to: " ++ show firstFreeHour)
+	let newSubject = (getSubjects classes)!!subjectIt
+	--let newSubject = subjects!!0
+	let newClassroom = classrooms!!classroomIt
+	let newGroup = groups!!groupIt
+	let newDay = (toEnum (dayIt)) :: Day
+	let duration = durations!!subjectIt
+	let dayTime = DayTime newDay firstFreeHour (firstFreeHour+duration)
+	let course = Course newSubject newGroup newClassroom dayTime
+	
+	printString("\n Probuje dodac przedmiot: " ++ newSubject ++" grupa: " ++ newGroup ++ " klasa: " ++ newClassroom ++ " dzien: " ++ show newDay ++ " od: " ++ show firstFreeHour ++ " do: " ++ show (firstFreeHour+duration) ++ "\n")
+	showSchedule model
+	
+	if  checkCourse model course then do
+		showMessageBox collisionErrorString
+		if firstFreeHour+duration <= 20 then --sprobuj o godzine pozniej
+			tryAdding model subjectIt dayIt (firstFreeHour+1) groupIt classroomIt
+		else if classroomIt < (length classrooms) - 1 then -- sprobuj w innej sali
+			tryAdding model subjectIt dayIt 8 groupIt (classroomIt+1)
+		else if dayIt < 7 then --sprobuj innego dnia
+			tryAdding model subjectIt (dayIt+1) firstFreeHour groupIt 0
+		else return model
+	else do
+		showMessageBox successfulOperationString
+		return (addCourseToModel model course)
+
+	where
+		classes = getClasses model
+		groups = getGroups model
+		classrooms = getClassrooms model
+		durations = map (\x -> (getDurationTime x) ) classes
+			
+runAutoSchedule model = 
+  addingLoop model 0 0 8 0 0
+  
