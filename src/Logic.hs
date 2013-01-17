@@ -261,7 +261,7 @@ checkSubject model course =
     
     
 checkGroup model course = 
-  elem dayTime (map snd selectedGroupList) 
+  any (checkDayTimeCollision  dayTime) (map snd selectedGroupList) 
   where  
     
     dayTime = getDayTime course
@@ -271,7 +271,7 @@ checkGroup model course =
     selectedGroupList = map fromJust $ filter isJust  $ map (\x -> if fst x == group then Just (fst x,snd x) else Nothing) groupList
     
 checkClassroom model course = 
-  elem dayTime (map snd selectedGroupList) 
+  any (checkDayTimeCollision  dayTime)(map snd selectedGroupList) 
   where  
     
     dayTime = getDayTime course
@@ -283,12 +283,12 @@ checkClassroom model course =
 checkDayTimeCollision ::  DayTime -> DayTime -> Bool
 checkDayTimeCollision  dt1 dt2 = 
   if d1 /= d2 then 
-    True
+    False
   else 
     if et1 < st2 || et2 < st1 then
-      True
-    else
       False
+    else
+      True
   where
     d1  = getDay dt1
     st1 = getClassStartTime dt1
