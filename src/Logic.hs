@@ -336,28 +336,26 @@ addingLoop model subjectIt dayIt firstFreeHour groupIt classroomIt = do
 		return model
 	else do
 	if subjectIt >= length(getSubjects classes) then do
-		printString("PLAN ZAJEC ZOSTAL ULOZONY! BRAWO!")
+		showSchedule model
+		showMessageBox successfulOperationString
 		return model
 	else do
 	
 	model <- tryAdding model subjectIt dayIt firstFreeHour groupIt classroomIt
-	printString("\nUdalo sie dodac!!!!!!!\n")
-	showSchedule model
+	--printString("\nPrzedmiot dodany!\n")
 	
 	--dodaj kolejna grupe
 	if groupIt < (length groups) - 1 then
-		addingLoop model subjectIt 0 firstFreeHour (groupIt+1) 0
+		addingLoop model subjectIt 0 8 (groupIt+1) 0
 	else -- dodaj kolejny przedmiot
-		addingLoop model (subjectIt+1) dayIt firstFreeHour 0 0
+		addingLoop model (subjectIt+1) 0 8 0 0
 		
 	where
 		classes = getClasses model
 		groups = getGroups model
 
 tryAdding model subjectIt dayIt firstFreeHour groupIt classroomIt= do
-	printString("Pierwsza wolna to: " ++ show firstFreeHour)
 	let newSubject = (getSubjects classes)!!subjectIt
-	--let newSubject = subjects!!0
 	let newClassroom = classrooms!!classroomIt
 	let newGroup = groups!!groupIt
 	let newDay = (toEnum (dayIt)) :: Day
@@ -365,20 +363,17 @@ tryAdding model subjectIt dayIt firstFreeHour groupIt classroomIt= do
 	let dayTime = DayTime newDay firstFreeHour (firstFreeHour+duration)
 	let course = Course newSubject newGroup newClassroom dayTime
 	
-	printString("\n Probuje dodac przedmiot: " ++ newSubject ++" grupa: " ++ newGroup ++ " klasa: " ++ newClassroom ++ " dzien: " ++ show newDay ++ " od: " ++ show firstFreeHour ++ " do: " ++ show (firstFreeHour+duration) ++ "\n")
-	showSchedule model
+	--printString("\n Probuje dodac przedmiot: " ++ newSubject ++" grupa: " ++ newGroup ++ " klasa: " ++ newClassroom ++ " dzien: " ++ show newDay ++ " od: " ++ show firstFreeHour ++ " do: " ++ show (firstFreeHour+duration) ++ "\n")
 	
 	if  checkCourse model course then do
-		showMessageBox collisionErrorString
 		if firstFreeHour+duration <= 20 then --sprobuj o godzine pozniej
 			tryAdding model subjectIt dayIt (firstFreeHour+1) groupIt classroomIt
 		else if classroomIt < (length classrooms) - 1 then -- sprobuj w innej sali
 			tryAdding model subjectIt dayIt 8 groupIt (classroomIt+1)
 		else if dayIt < 7 then --sprobuj innego dnia
-			tryAdding model subjectIt (dayIt+1) firstFreeHour groupIt 0
+			tryAdding model subjectIt (dayIt+1) 8 groupIt 0
 		else return model
 	else do
-		showMessageBox successfulOperationString
 		return (addCourseToModel model course)
 
 	where
